@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
-import '../services/database_service.dart';
+//import '../services/database_service.dart';
 
 class FlashcardForm extends StatefulWidget {
   const FlashcardForm({super.key});
@@ -15,20 +15,32 @@ class _FlashcardFormState extends State<FlashcardForm> {
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _exampleController = TextEditingController();
 
-  void _saveFlashcard() async {
-    if (_termController.text.isEmpty || _definitionController.text.isEmpty || _exampleController.text.isEmpty) {
+  void _saveFlashcard() {
+    print("✅ _saveFlashcard fonksiyonu çalıştı!");
+    if (_termController.text.isEmpty ||
+        _definitionController.text.isEmpty ||
+        _exampleController.text.isEmpty) {
+      print("⚠️ Boş alanlar var, flashcard eklenmiyor!");
       return;
     }
 
     Flashcard newFlashcard = Flashcard(
       term: _termController.text,
       definition: _definitionController.text,
-      category: _categoryController.text.isEmpty ? "General" : _categoryController.text,
+      category: _categoryController.text.isEmpty
+          ? "General"
+          : _categoryController.text,
       example: _exampleController.text,
     );
-
-    await DatabaseService().insertFlashcard(newFlashcard);
-    Navigator.pop(context); // Return to the previous screen
+    print(
+        "🟢 Yeni Flashcard: ${newFlashcard.term} - ${newFlashcard.definition}");
+    try {
+      Navigator.pop(context, newFlashcard);
+      print("✅ Navigator.pop BAŞARILI!");
+    } catch (e) {
+      print("❌ Navigator.pop HATASI: $e");
+    }
+    // Geri döndür
   }
 
   @override
@@ -49,7 +61,8 @@ class _FlashcardFormState extends State<FlashcardForm> {
             ),
             TextField(
               controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Category (Optional)'),
+              decoration:
+                  const InputDecoration(labelText: 'Category (Optional)'),
             ),
             TextField(
               controller: _exampleController,
@@ -57,7 +70,10 @@ class _FlashcardFormState extends State<FlashcardForm> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _saveFlashcard,
+              onPressed: () {
+                print("🟢 Kaydet Butonuna Basıldı!");
+                _saveFlashcard();
+              },
               child: const Text('Save Flashcard'),
             ),
           ],
