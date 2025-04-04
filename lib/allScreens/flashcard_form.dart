@@ -1,6 +1,10 @@
+import 'package:flipera/widgets/custom_textfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';
+import '../utils/utils.dart';
+import '../widgets/custom_button.dart';
 
 class FlashcardForm extends StatefulWidget {
   const FlashcardForm({super.key});
@@ -27,6 +31,7 @@ class _FlashcardFormState extends State<FlashcardForm> {
       example: _exampleController.text,
     );
 
+    showInfoMessage(context, 'Flashcard saved successfully!');
     await DatabaseService().insertFlashcard(newFlashcard);
     Navigator.pop(context); // Return to the previous screen
   }
@@ -34,32 +39,35 @@ class _FlashcardFormState extends State<FlashcardForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Flashcard')),
+      appBar: AppBar(title: const Text('Add Flashcard'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
+            CustomTextField(
               controller: _termController,
-              decoration: const InputDecoration(labelText: 'Term'),
+              labelText: "Term",
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _definitionController,
-              decoration: const InputDecoration(labelText: 'Definition'),
+              labelText: "Definition",
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Category (Optional)'),
+              labelText: "Category (Optional)"
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _exampleController,
-              decoration: const InputDecoration(labelText: 'Example'),
+              labelText: "Example",
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
+            CustomButton(
+              text: 'Save Flashcard',
               onPressed: _saveFlashcard,
-              child: const Text('Save Flashcard'),
-            ),
+            )
           ],
         ),
       ),

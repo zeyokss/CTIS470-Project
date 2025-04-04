@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    const MaterialApp(
+     MaterialApp(
+      title: 'FlipEra',
+      theme: ThemeData(
+        fontFamily: 'Montserrat', // not 'Poppins'
+        primarySwatch: Colors.cyan,
+      ),
       debugShowCheckedModeBanner: false,
       home: HomeScreen(),
     ),
