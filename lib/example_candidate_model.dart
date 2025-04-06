@@ -10,7 +10,7 @@ class ExampleCandidateModel {
     required this.type,
     required this.category,
     required this.definition,
-    required this.example
+    required this.example,
   });
 }
 

@@ -25,10 +25,10 @@ class ExampleCard extends StatelessWidget {
         ],
       ),
       alignment: Alignment.center,
-      padding: const EdgeInsets.all(16), // Added padding for better spacing
+      padding: const EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Centers the text vertically
-        crossAxisAlignment: CrossAxisAlignment.center, // Centers the text horizontally
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             candidate.word,
@@ -38,7 +38,7 @@ class ExampleCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),
-            textAlign: TextAlign.center, // Centers the text inside the widget
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Text(
@@ -53,7 +53,8 @@ class ExampleCard extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             candidate.category,
-            style: const TextStyle(color: Colors.white,
+            style: const TextStyle(
+              color: Colors.white,
               fontFamily: "Montserrat",
             ),
             textAlign: TextAlign.center,
@@ -61,7 +62,8 @@ class ExampleCard extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             candidate.definition,
-            style: const TextStyle(color: Colors.white,
+            style: const TextStyle(
+              color: Colors.white,
               fontFamily: "Montserrat",
             ),
             textAlign: TextAlign.center,
@@ -69,7 +71,8 @@ class ExampleCard extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             candidate.example,
-            style: const TextStyle(color: Colors.white,
+            style: const TextStyle(
+              color: Colors.white,
               fontFamily: "Montserrat",
             ),
             textAlign: TextAlign.center,

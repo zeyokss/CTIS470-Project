@@ -17,7 +17,7 @@ class FlashcardWidget extends StatelessWidget {
             ? const Icon(Icons.check_circle, color: Colors.green)
             : const Icon(Icons.bookmark_border, color: Colors.grey),
         onTap: () {
-          // Navigate to details screen
+          // Navigate to a detailed view if needed.
         },
       ),
     );

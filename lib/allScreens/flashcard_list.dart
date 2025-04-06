@@ -1,61 +1,7 @@
-/*
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';
-import '../widgets/flashcard_widget.dart';
-
-class FlashcardList extends StatefulWidget {
-  const FlashcardList({super.key});
-
-  @override
-  _FlashcardListState createState() => _FlashcardListState();
-}
-
-class _FlashcardListState extends State<FlashcardList> {
-  late Future<List<Flashcard>> flashcards;
-
-  @override
-  void initState() {
-    super.initState();
-    flashcards = DatabaseService().getFlashcards();
-  }
-
-  void refreshFlashcards() {
-    setState(() {
-      flashcards = DatabaseService().getFlashcards();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Flashcard>>(
-      future: flashcards,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-
-        return ListView.builder(
-          itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) {
-            return Dismissible(
-              key: ValueKey(snapshot.data![index].id),
-              background: Container(color: Colors.red),
-              onDismissed: (direction) {
-                DatabaseService().deleteFlashcard(snapshot.data![index].id!);
-                refreshFlashcards();
-              },
-              child: FlashcardWidget(flashcard: snapshot.data![index]),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-*/
-import 'package:flutter/material.dart';
-import '../models/flashcard.dart';
-import '../services/database_service.dart';
-import '../example_candidate_model.dart'; // ExampleCandidateModel & candidates
+import '../example_candidate_model.dart';
 import '../widgets/flashcard_widget.dart';
 
 class FlashcardListPage extends StatefulWidget {
@@ -84,16 +30,12 @@ class _FlashcardListPageState extends State<FlashcardListPage> {
   }
 
   Future<void> _addFlashcard() async {
-    print("✅ _addFlashcard fonksiyonu çalıştı!");
     final newFlashcard = await Navigator.pushNamed(context, '/add');
 
     if (newFlashcard != null && newFlashcard is Flashcard) {
-      print("🟢 Yeni eklenen Flashcard: ${newFlashcard.term}");
       setState(() {
         _allFlashcards.add(newFlashcard);
       });
-    } else {
-      print("⚠️ Yeni flashcard NULL döndü!");
     }
   }
 
@@ -107,9 +49,30 @@ class _FlashcardListPageState extends State<FlashcardListPage> {
               padding: const EdgeInsets.all(16.0),
               itemCount: _allFlashcards.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: FlashcardWidget(flashcard: _allFlashcards[index]),
+                return Dismissible(
+                  key: ValueKey(_allFlashcards[index].id ?? index),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 20),
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) async {
+                    if (_allFlashcards[index].id != null) {
+                      await DatabaseService().deleteFlashcard(_allFlashcards[index].id!);
+                    }
+                    setState(() {
+                      _allFlashcards.removeAt(index);
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Flashcard deleted")),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: FlashcardWidget(flashcard: _allFlashcards[index]),
+                  ),
                 );
               },
             ),
@@ -120,8 +83,7 @@ class _FlashcardListPageState extends State<FlashcardListPage> {
     );
   }
 
-  List<Flashcard> convertCandidatesToFlashcards(
-      List<ExampleCandidateModel> examples) {
+  List<Flashcard> convertCandidatesToFlashcards(List<ExampleCandidateModel> examples) {
     return examples
         .map((e) => Flashcard(
               term: e.word,

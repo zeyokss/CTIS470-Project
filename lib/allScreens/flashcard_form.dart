@@ -1,5 +1,4 @@
 import 'package:flipera/widgets/custom_textfield.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';
@@ -20,7 +19,10 @@ class _FlashcardFormState extends State<FlashcardForm> {
   final TextEditingController _exampleController = TextEditingController();
 
   void _saveFlashcard() async {
-    if (_termController.text.isEmpty || _definitionController.text.isEmpty || _exampleController.text.isEmpty) {
+    if (_termController.text.isEmpty ||
+        _definitionController.text.isEmpty ||
+        _exampleController.text.isEmpty) {
+      showWarningMessage(context, 'Please fill all required fields.');
       return;
     }
 
@@ -33,7 +35,7 @@ class _FlashcardFormState extends State<FlashcardForm> {
 
     showInfoMessage(context, 'Flashcard saved successfully!');
     await DatabaseService().insertFlashcard(newFlashcard);
-    Navigator.pop(context); // Return to the previous screen
+    Navigator.pop(context, newFlashcard);
   }
 
   @override
@@ -56,7 +58,8 @@ class _FlashcardFormState extends State<FlashcardForm> {
             const SizedBox(height: 8),
             CustomTextField(
               controller: _categoryController,
-              labelText: "Category (Optional)"
+              labelText: "Category",
+              isOptional: true,
             ),
             const SizedBox(height: 8),
             CustomTextField(

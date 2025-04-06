@@ -11,8 +11,8 @@ class Flashcard {
     required this.term,
     required this.definition,
     required this.category,
-    this.isLearned = false,
     required this.example,
+    this.isLearned = false,
   });
 
   // Convert Flashcard to Map for Database Storage
@@ -22,6 +22,7 @@ class Flashcard {
       'term': term,
       'definition': definition,
       'category': category,
+      'example': example,
       'isLearned': isLearned ? 1 : 0,
     };
   }
