@@ -33,6 +33,7 @@ class ExampleCard extends StatelessWidget {
           Text(
             candidate.word,
             style: const TextStyle(
+              fontFamily: "Montserrat",
               color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 20,
@@ -43,6 +44,7 @@ class ExampleCard extends StatelessWidget {
           Text(
             candidate.type,
             style: const TextStyle(
+              fontFamily: "Montserrat",
               color: Colors.white,
               fontSize: 15,
             ),
@@ -51,19 +53,25 @@ class ExampleCard extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             candidate.category,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white,
+              fontFamily: "Montserrat",
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 5),
           Text(
             candidate.definition,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white,
+              fontFamily: "Montserrat",
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 5),
           Text(
             candidate.example,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white,
+              fontFamily: "Montserrat",
+            ),
             textAlign: TextAlign.center,
           ),
         ],

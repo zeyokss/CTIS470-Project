@@ -1,3 +1,5 @@
+import 'dart:ui'; // for ImageFilter.blur
+
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
@@ -58,25 +60,38 @@ class _HomePageState extends State<HomePage> {
                       controller: cong,
                       animationDuration: const Duration(milliseconds: 800),
                       axis: FlipAxis.horizontal,
-                      frontWidget: Center(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.pinkAccent,
-                          ),
-                          child: Center(
-                            child: Text(
-                              candidate.word,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
+                        frontWidget: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.pinkAccent,
+                            ),
+                            child: Center(
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.8, end: 1.0), // Start a bit smaller
+                                duration: const Duration(milliseconds: 800),
+                                builder: (context, value, child) {
+                                  return Opacity(
+                                    opacity: value, // Fade in with same value
+                                    child: Transform.scale(
+                                      scale: value, // Zoom in with same value
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  candidate.word,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                      ),
                       backWidget: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -85,30 +100,40 @@ class _HomePageState extends State<HomePage> {
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  candidate.definition,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0.0, end: 1.0), // ✨ FADE from 0 opacity to 1
+                              duration: const Duration(seconds: 1), // ✨ 2 seconds fade-in
+                              builder: (context, value, child) {
+                                return Opacity(
+                                  opacity: (cong.state?.isFront ?? true) ? 0.0 : value,
+                                  child: child,
+                                );
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    candidate.definition,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  'Example: "${candidate.example}"',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white70,
-                                    fontStyle: FontStyle.italic,
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'Example: "${candidate.example}"',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white70,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -150,12 +175,10 @@ class _HomePageState extends State<HomePage> {
       int? currentIndex,
       CardSwiperDirection direction,
       ) {
-    debugPrint(
-      'The card $previousIndex was swiped to the ${direction.name}. Now the card $currentIndex is on top',
-    );
-
+    cong.showFront(); // 🔥 Flip softly to front after swipe
     return true;
   }
+
 
   bool _onUndo(
       int? previousIndex,
@@ -166,5 +189,14 @@ class _HomePageState extends State<HomePage> {
       'The card $currentIndex was undod from the ${direction.name}',
     );
     return true;
+  }
+}
+
+extension FlipCardReset on GestureFlipCardController {
+  void showFront() {
+    if (state != null && !(state!.isFront)) {
+      // Only flip once if the card is showing BACK
+      state!.gestureflipCard(); // 🔥 Smooth flip to front
+    }
   }
 }

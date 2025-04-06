@@ -1,6 +1,10 @@
+import 'package:flipera/widgets/custom_textfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
-//import '../services/database_service.dart';
+import '../services/database_service.dart';
+import '../utils/utils.dart';
+import '../widgets/custom_button.dart';
 
 class FlashcardForm extends StatefulWidget {
   const FlashcardForm({super.key});
@@ -15,67 +19,55 @@ class _FlashcardFormState extends State<FlashcardForm> {
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _exampleController = TextEditingController();
 
-  void _saveFlashcard() {
-    print("✅ _saveFlashcard fonksiyonu çalıştı!");
-    if (_termController.text.isEmpty ||
-        _definitionController.text.isEmpty ||
-        _exampleController.text.isEmpty) {
-      print("⚠️ Boş alanlar var, flashcard eklenmiyor!");
+  void _saveFlashcard() async {
+    if (_termController.text.isEmpty || _definitionController.text.isEmpty || _exampleController.text.isEmpty) {
       return;
     }
 
     Flashcard newFlashcard = Flashcard(
       term: _termController.text,
       definition: _definitionController.text,
-      category: _categoryController.text.isEmpty
-          ? "General"
-          : _categoryController.text,
+      category: _categoryController.text.isEmpty ? "General" : _categoryController.text,
       example: _exampleController.text,
     );
-    print(
-        "🟢 Yeni Flashcard: ${newFlashcard.term} - ${newFlashcard.definition}");
-    try {
-      Navigator.pop(context, newFlashcard);
-      print("✅ Navigator.pop BAŞARILI!");
-    } catch (e) {
-      print("❌ Navigator.pop HATASI: $e");
-    }
-    // Geri döndür
+
+    showInfoMessage(context, 'Flashcard saved successfully!');
+    await DatabaseService().insertFlashcard(newFlashcard);
+    Navigator.pop(context); // Return to the previous screen
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Flashcard')),
+      appBar: AppBar(title: const Text('Add Flashcard'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
+            CustomTextField(
               controller: _termController,
-              decoration: const InputDecoration(labelText: 'Term'),
+              labelText: "Term",
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _definitionController,
-              decoration: const InputDecoration(labelText: 'Definition'),
+              labelText: "Definition",
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _categoryController,
-              decoration:
-                  const InputDecoration(labelText: 'Category (Optional)'),
+              labelText: "Category (Optional)"
             ),
-            TextField(
+            const SizedBox(height: 8),
+            CustomTextField(
               controller: _exampleController,
-              decoration: const InputDecoration(labelText: 'Example'),
+              labelText: "Example",
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                print("🟢 Kaydet Butonuna Basıldı!");
-                _saveFlashcard();
-              },
-              child: const Text('Save Flashcard'),
-            ),
+            CustomButton(
+              text: 'Save Flashcard',
+              onPressed: _saveFlashcard,
+            )
           ],
         ),
       ),
