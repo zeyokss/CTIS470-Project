@@ -60,6 +60,15 @@ android {
     }
 }
 
+ext {
+    flutter = [
+        compileSdkVersion: 33,
+        minSdkVersion    : 21,
+        targetSdkVersion : 33,
+        ndkVersion       : "21.4.7075529"
+    ]
+}
+
 flutter {
     source '../..'
 }

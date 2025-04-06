@@ -53,28 +53,82 @@ class _FlashcardListState extends State<FlashcardList> {
 }
 */
 import 'package:flutter/material.dart';
-import 'package:flipera/example_candidate_model.dart';
-import 'package:flipera/example_card.dart';
+import '../models/flashcard.dart';
+import '../services/database_service.dart';
+import '../example_candidate_model.dart'; // ExampleCandidateModel & candidates
+import '../widgets/flashcard_widget.dart';
 
-class FlashcardListPage extends StatelessWidget {
+class FlashcardListPage extends StatefulWidget {
   const FlashcardListPage({super.key});
+
+  @override
+  State<FlashcardListPage> createState() => _FlashcardListPageState();
+}
+
+class _FlashcardListPageState extends State<FlashcardListPage> {
+  List<Flashcard> _allFlashcards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFlashcards();
+  }
+
+  Future<void> _loadFlashcards() async {
+    List<Flashcard> exampleCards = convertCandidatesToFlashcards(candidates);
+    List<Flashcard> dbFlashcards = await DatabaseService().getFlashcards();
+
+    setState(() {
+      _allFlashcards = [...exampleCards, ...dbFlashcards];
+    });
+  }
+
+  Future<void> _addFlashcard() async {
+    print("✅ _addFlashcard fonksiyonu çalıştı!");
+    final newFlashcard = await Navigator.pushNamed(context, '/add');
+
+    if (newFlashcard != null && newFlashcard is Flashcard) {
+      print("🟢 Yeni eklenen Flashcard: ${newFlashcard.term}");
+      setState(() {
+        _allFlashcards.add(newFlashcard);
+      });
+    } else {
+      print("⚠️ Yeni flashcard NULL döndü!");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Flashcard List"),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: candidates.length, // Use the example candidate data
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: ExampleCard(candidates[index]), // Display each flashcard
-          );
-        },
+      appBar: AppBar(title: const Text("Flashcard List")),
+      body: _allFlashcards.isEmpty
+          ? const Center(child: Text("No flashcards found."))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _allFlashcards.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: FlashcardWidget(flashcard: _allFlashcards[index]),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addFlashcard,
+        child: const Icon(Icons.add),
       ),
     );
+  }
+
+  List<Flashcard> convertCandidatesToFlashcards(
+      List<ExampleCandidateModel> examples) {
+    return examples
+        .map((e) => Flashcard(
+              term: e.word,
+              definition: e.definition,
+              category: e.category,
+              example: e.example,
+            ))
+        .toList();
   }
 }
