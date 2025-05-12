@@ -2,6 +2,7 @@ import 'package:flipera/widgets/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';
+import '../services/firestore_service.dart';
 import '../utils/utils.dart';
 import '../widgets/custom_button.dart';
 
@@ -13,12 +14,12 @@ class FlashcardForm extends StatefulWidget {
 }
 
 class _FlashcardFormState extends State<FlashcardForm> {
-  final TextEditingController _termController = TextEditingController();
+  final TextEditingController _termController       = TextEditingController();
   final TextEditingController _definitionController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _exampleController = TextEditingController();
+  final TextEditingController _categoryController   = TextEditingController();
+  final TextEditingController _exampleController    = TextEditingController();
 
-  void _saveFlashcard() async {
+  Future<void> _saveFlashcard() async {
     if (_termController.text.isEmpty ||
         _definitionController.text.isEmpty ||
         _exampleController.text.isEmpty) {
@@ -26,22 +27,36 @@ class _FlashcardFormState extends State<FlashcardForm> {
       return;
     }
 
-    Flashcard newFlashcard = Flashcard(
-      term: _termController.text,
+    final newFlashcard = Flashcard(
+      term:       _termController.text,
       definition: _definitionController.text,
-      category: _categoryController.text.isEmpty ? "General" : _categoryController.text,
-      example: _exampleController.text,
+      category:   _categoryController.text.isEmpty
+                    ? "General"
+                    : _categoryController.text,
+      example:    _exampleController.text,
     );
 
-    showInfoMessage(context, 'Flashcard saved successfully!');
-    await DatabaseService().insertFlashcard(newFlashcard);
-    Navigator.pop(context, newFlashcard);
+    try {
+      // 1) Save locally
+      await DatabaseService().insertFlashcard(newFlashcard);
+      // 2) Save to Firestore
+      await FirestoreService().addFlashcard(newFlashcard);
+
+      // 3) Notify & return
+      showInfoMessage(context, 'Flashcard saved successfully!');
+      Navigator.pop(context);
+    } catch (e) {
+      showWarningMessage(context, 'Error saving flashcard: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Flashcard'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Add Flashcard'),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -70,7 +85,7 @@ class _FlashcardFormState extends State<FlashcardForm> {
             CustomButton(
               text: 'Save Flashcard',
               onPressed: _saveFlashcard,
-            )
+            ),
           ],
         ),
       ),
