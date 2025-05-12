@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "114011199776",
+    "project_id": "flipera-dev",
+    "storage_bucket": "flipera-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114011199776:android:dd690301793aca12661f45",
+        "android_client_info": {
+          "package_name": "com.example.flipera"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeKZ2GbVYB92Wz88iElxZZcIQhknNLK20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
