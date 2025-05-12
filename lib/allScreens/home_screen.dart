@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'flashcard_list.dart';
 import 'home_page.dart';
+import 'category_screen.dart'; // ← make sure to import this
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,14 +11,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Only two tabs: Flashcard List (index 0) and HomePage ("Learn", index 1)
-  int _selectedIndex = 1; // Start with HomePage ("Learn") as default
-  
+  int _selectedIndex = 1;  
+
   final List<Widget> _screens = [
-    const FlashcardListPage(), // Flashcard list screen (with add FAB)
-    const HomePage(),          // Learn screen
+    const FlashcardListPage(), 
+    const HomePage(),          
+    const CategoryScreen(),
   ];
-  
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -35,8 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Flashcards'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Learn'),
+          BottomNavigationBarItem(icon: Icon(Icons.list),   label: 'Flashcards'),
+          BottomNavigationBarItem(icon: Icon(Icons.home),   label: 'Learn'),
+          BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Category'),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
