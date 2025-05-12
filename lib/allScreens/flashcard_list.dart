@@ -1,3 +1,4 @@
+// lib/allScreens/flashcard_list.dart
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';
@@ -6,7 +7,7 @@ import '../example_candidate_model.dart';
 import '../widgets/flashcard_widget.dart';
 
 class FlashcardListPage extends StatefulWidget {
-  const FlashcardListPage({super.key});
+  const FlashcardListPage({Key? key}) : super(key: key);
 
   @override
   State<FlashcardListPage> createState() => _FlashcardListPageState();
@@ -31,9 +32,7 @@ class _FlashcardListPageState extends State<FlashcardListPage> {
 
   Future<void> _addFlashcard() async {
     await Navigator.pushNamed(context, '/add');
-    // Reload local cards in case new ones were added locally
     _loadLocalCards();
-    // StreamBuilder will rebuild for Firestore changes
   }
 
   @override
@@ -49,7 +48,8 @@ class _FlashcardListPageState extends State<FlashcardListPage> {
 
           final exampleCards = convertCandidatesToFlashcards(candidates);
           final cloudCards = snapshot.data ?? [];
-          final allCards = [...exampleCards, ..._dbCards, ...cloudCards];
+          final localOnly = _dbCards.where((c) => c.firestoreId == null).toList();
+          final allCards = [...exampleCards, ...localOnly, ...cloudCards];
 
           if (allCards.isEmpty) {
             return const Center(child: Text('No flashcards found.'));

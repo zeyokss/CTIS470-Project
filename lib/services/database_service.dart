@@ -1,3 +1,4 @@
+// lib/services/database_service.dart
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/flashcard.dart';
@@ -12,11 +13,11 @@ class DatabaseService {
   }
 
   Future<Database> _initDB() async {
-    String dbPath = await getDatabasesPath();
-    String path = join(dbPath, 'flashcards.db');
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'flashcards.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE flashcards (
@@ -25,31 +26,82 @@ class DatabaseService {
             definition TEXT NOT NULL,
             category TEXT NOT NULL,
             example TEXT NOT NULL,
-            isLearned INTEGER NOT NULL
+            isLearned INTEGER NOT NULL,
+            firestoreId TEXT
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE flashcards ADD COLUMN firestoreId TEXT;');
+        }
       },
     );
   }
 
-  Future<void> insertFlashcard(Flashcard card) async {
+  Future<int> insertFlashcard(Flashcard card) async {
     final db = await database;
-    await db.insert('flashcards', card.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'flashcards',
+      card.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Flashcard>> getFlashcards() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('flashcards');
-    return List.generate(maps.length, (i) => Flashcard.fromMap(maps[i]));
+    final maps = await db.query('flashcards');
+    return maps.map((m) => Flashcard.fromMap(m)).toList();
   }
 
   Future<void> updateFlashcard(Flashcard card) async {
     final db = await database;
-    await db.update('flashcards', card.toMap(), where: 'id = ?', whereArgs: [card.id]);
+    await db.update(
+      'flashcards',
+      card.toMap(),
+      where: 'id = ?',
+      whereArgs: [card.id],
+    );
   }
 
   Future<void> deleteFlashcard(int id) async {
     final db = await database;
-    await db.delete('flashcards', where: 'id = ?', whereArgs: [id]);
+    await db.delete(
+      'flashcards',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> updateFirestoreId(int id, String firestoreId) async {
+    final db = await database;
+    await db.update(
+      'flashcards',
+      {'firestoreId': firestoreId},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> insertOrUpdate(Flashcard card) async {
+    final db = await database;
+    final count = await db.update(
+      'flashcards',
+      card.toMap(),
+      where: 'firestoreId = ?',
+      whereArgs: [card.firestoreId],
+    );
+    if (count == 0) {
+      await db.insert('flashcards', card.toMap());
+    }
+  }
+
+  Future<void> deleteByFirestoreId(String firestoreId) async {
+    final db = await database;
+    await db.delete(
+      'flashcards',
+      where: 'firestoreId = ?',
+      whereArgs: [firestoreId],
+    );
   }
 }

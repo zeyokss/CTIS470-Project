@@ -1,4 +1,4 @@
-/* lib/views/category_screen.dart */
+/* lib/allScreens/category_screen.dart */
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 import '../services/database_service.dart';

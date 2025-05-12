@@ -1,3 +1,4 @@
+/* lib/widgets/flashcard_widget.dart */
 import 'package:flutter/material.dart';
 import '../models/flashcard.dart';
 
